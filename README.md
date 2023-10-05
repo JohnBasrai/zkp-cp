@@ -10,7 +10,9 @@ Rust crates directly used
   various components, such as Hyper, Tonic, Tower, and Mio, for
   different needs and scenarios.
 
-- tonic - gRPC, Rust implementation of gRPC
+- tonic   For gRPC, Rust implementation of gRPC
+- clap    Argument parsing
+- anyhow  Provides better error handling
 
 ## Building
 
@@ -26,8 +28,9 @@ cargo run --release --bin server
 ```
 In a second shell window run command
 ```
-cargo run --release --bin client
+cargo run --release --bin client -- --user "UserName" --password "Password"
 ```
+You shouldn't crate a real program that takes password on the command line but this is a demo only.
 
 ## Containerization
 
