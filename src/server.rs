@@ -1,3 +1,5 @@
+use anyhow::Result;
+use clap::Parser;
 use std::{collections::HashMap, sync::Mutex};
 
 use num_bigint::BigUint;
@@ -15,6 +17,48 @@ use zkp_auth::{
     AuthenticationAnswerRequest, AuthenticationAnswerResponse, AuthenticationChallengeRequest,
     AuthenticationChallengeResponse, RegisterRequest, RegisterResponse,
 };
+
+#[derive(Debug, Parser)]
+#[command(author, version, about, long_about = None)]
+/// Chaum-Pedersen Zero Knowledge Proof (server)
+struct Args
+{
+    /// Server listening endpoint
+    #[arg(short, long, required = false, default_value = "127.0.0.1:50051")]
+    endpoint: String,
+}
+
+#[tokio::main]
+async fn main() -> Result<(), String>
+{
+    let args = &Args::parse();
+    let addr = args.endpoint.clone();
+
+    println!("✅ Server listening at {}", addr);
+
+    let addr = match addr.parse()
+    {
+        Ok(a) => a,
+        Err(e) =>
+        {
+            return Err(format!("could not convert address:{} error:{:?}", addr, e));
+        }
+    };
+
+    match Server::builder()
+        .add_service(AuthServer::new(AuthImpl::default()))
+        .serve(addr)
+        .await
+    {
+        Ok(x) => x,
+        Err(e) =>
+        {
+            return Err(format!("Server create failed endpoint:{} error:{:?}", args.endpoint, e));
+        }
+    };
+
+    Ok(())
+}
 
 #[derive(Debug, Default)]
 pub struct AuthImpl
@@ -164,20 +208,4 @@ impl Auth for AuthImpl
             ))
         }
     }
-}
-
-#[tokio::main]
-async fn main()
-{
-    let addr = "127.0.0.1:50051".to_string();
-
-    println!("✅ Running the server in {}", addr);
-
-    let auth_impl = AuthImpl::default();
-
-    Server::builder()
-        .add_service(AuthServer::new(auth_impl))
-        .serve(addr.parse().expect("could not convert address"))
-        .await
-        .unwrap();
 }
