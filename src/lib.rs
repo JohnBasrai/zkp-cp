@@ -1,50 +1,97 @@
 use num_bigint::{BigUint, RandBigInt};
 use rand::Rng;
 
-pub struct ZKP
-{
-    pub p:     BigUint,
-    pub q:     BigUint,
+/// A struct representing the Zero-Knowledge Proof (ZKP) parameters.
+///
+/// This struct holds the parameters required for performing Zero-Knowledge Proofs,
+/// including the prime numbers `p` and `q`, and the generators `alpha` and `beta`.
+pub struct ZKP {
+    pub p: BigUint,
+    pub q: BigUint,
     pub alpha: BigUint,
-    pub beta:  BigUint,
+    pub beta: BigUint,
 }
 
-impl ZKP
-{
-    pub fn new(p: &BigUint, q: &BigUint, alpha: &BigUint, beta: &BigUint) -> Self
-    {
+impl ZKP {
+    /// Creates a new `ZKP` instance with the specified parameters.
+    ///
+    /// # Arguments
+    ///
+    /// * `p` - A reference to a `BigUint` representing the prime number `p`.
+    /// * `q` - A reference to a `BigUint` representing the prime number `q`.
+    /// * `alpha` - A reference to a `BigUint` representing the generator `alpha`.
+    /// * `beta` - A reference to a `BigUint` representing the generator `beta`.
+    ///
+    /// # Returns
+    ///
+    /// A new `ZKP` instance initialized with the provided parameters.
+    pub fn new(p: &BigUint, q: &BigUint, alpha: &BigUint, beta: &BigUint) -> Self {
         Self {
-            p:     p.clone(),
-            q:     q.clone(),
+            p: p.clone(),
+            q: q.clone(),
             alpha: alpha.clone(),
-            beta:  beta.clone(),
+            beta: beta.clone(),
         }
     }
 
-    /// output = (alpha^exp mod p, beta^exp mod p)
-    pub fn compute_pair(&self, exp: &BigUint) -> (BigUint, BigUint)
-    {
+    /// Computes a pair of values based on the ZKP parameters and an exponent.
+    ///
+    /// This method calculates the pair of outputs as `(alpha^exp mod p, beta^exp mod p)`.
+    ///
+    /// # Arguments
+    ///
+    /// * `exp` - A reference to a `BigUint` representing the exponent.
+    ///
+    /// # Returns
+    ///
+    /// A tuple containing the computed values as `BigUint`.
+    pub fn compute_pair(&self, exp: &BigUint) -> (BigUint, BigUint) {
         let p1 = self.alpha.modpow(exp, &self.p);
         let p2 = self.beta.modpow(exp, &self.p);
         (p1, p2)
     }
 
-    /// output = s = k - c * x mod q
-    pub fn solve(&self, k: &BigUint, c: &BigUint, x: &BigUint) -> BigUint
-    {
-        if *k >= c * x
-        {
+    /// Solves for the value `s` based on the provided parameters.
+    ///
+    /// The solution is computed using the formula `s = k - c * x mod q`.
+    ///
+    /// # Arguments
+    ///
+    /// * `k` - A reference to a `BigUint` representing `k`.
+    /// * `c` - A reference to a `BigUint` representing `c`.
+    /// * `x` - A reference to a `BigUint` representing `x`.
+    ///
+    /// # Returns
+    ///
+    /// A `BigUint` representing the computed value `s`.
+    pub fn solve(&self, k: &BigUint, c: &BigUint, x: &BigUint) -> BigUint {
+        if *k >= c * x {
             return (k - c * x).modpow(&BigUint::from(1u32), &self.q);
         }
         &self.q - (c * x - k).modpow(&BigUint::from(1u32), &self.q)
     }
 
-    /// cond1: r1 = alpha^s * y1^c
-    /// cond2: r2 = beta^s * y2^c
+    /// Verifies the conditions for the ZKP.
+    ///
+    /// The verification checks the conditions:
+    /// 1. `r1 = alpha^s * y1^c`
+    /// 2. `r2 = beta^s * y2^c`
+    ///
+    /// # Arguments
+    ///
+    /// * `r1` - A reference to a `BigUint` representing the first response.
+    /// * `r2` - A reference to a `BigUint` representing the second response.
+    /// * `y1` - A reference to a `BigUint` representing the first witness.
+    /// * `y2` - A reference to a `BigUint` representing the second witness.
+    /// * `c`  - A reference to a `BigUint` representing the challenge value.
+    /// * `s`  - A reference to a `BigUint` representing the response value.
+    ///
+    /// # Returns
+    ///
+    /// A boolean indicating whether the verification conditions are met.
     pub fn verify(
         &self, r1: &BigUint, r2: &BigUint, y1: &BigUint, y2: &BigUint, c: &BigUint, s: &BigUint,
-    ) -> bool
-    {
+    ) -> bool {
         let cond1 = *r1
             == (&self.alpha.modpow(s, &self.p) * y1.modpow(c, &self.p))
                 .modpow(&BigUint::from(1u32), &self.p);
@@ -56,15 +103,23 @@ impl ZKP
         cond1 && cond2
     }
 
-    pub fn generate_random_number_below(bound: &BigUint) -> BigUint
-    {
+    /// Generates a random alphanumeric string of the specified size.
+    ///
+    /// This method uses a secure random number generator to produce a random string containing
+    /// alphanumeric characters.
+    ///
+    /// # Arguments
+    /// * `size` - The length of the string to be generated.
+    ///
+    /// # Returns
+    /// A `String` representing the generated random alphanumeric string.
+    pub fn generate_random_number_below(bound: &BigUint) -> BigUint {
         let mut rng = rand::thread_rng();
 
         rng.gen_biguint_below(bound)
     }
 
-    pub fn generate_random_string(size: usize) -> String
-    {
+    pub fn generate_random_string(size: usize) -> String {
         rand::thread_rng()
             .sample_iter(rand::distributions::Alphanumeric)
             .take(size)
@@ -72,6 +127,14 @@ impl ZKP
             .collect()
     }
 
+    /// Retrieves the ZKP constants used in the Zero-Knowledge Proof protocol.
+    ///
+    /// This method returns the constants `alpha`, `beta`, `p`, and `q` which are
+    /// fundamental to the ZKP computations.
+    ///
+    /// # Returns
+    ///
+    /// A tuple containing the constants `(alpha, beta, p, q)` as `BigUint`.
     #[rustfmt::skip]
     pub fn get_constants() -> (BigUint, BigUint, BigUint, BigUint)
     {
@@ -97,13 +160,11 @@ impl ZKP
 }
 
 #[cfg(test)]
-mod test
-{
+mod test {
     use super::*;
 
     #[test]
-    fn test_toy_example()
-    {
+    fn test_toy_example() {
         let alpha = BigUint::from(4u32);
         let beta = BigUint::from(9u32);
         let p = BigUint::from(23u32);
@@ -138,17 +199,16 @@ mod test
     }
 
     #[test]
-    fn test_toy_example_with_random_numbers()
-    {
+    fn test_toy_example_with_random_numbers() {
         let alpha = BigUint::from(4u32);
         let beta = BigUint::from(9u32);
         let p = BigUint::from(23u32);
         let q = BigUint::from(11u32);
         let zkp = ZKP {
-            p:     p.clone(),
-            q:     q.clone(),
+            p: p.clone(),
+            q: q.clone(),
             alpha: alpha.clone(),
-            beta:  beta.clone(),
+            beta: beta.clone(),
         };
 
         let x = BigUint::from(6u32);
@@ -211,8 +271,7 @@ mod test
     }
 
     #[test]
-    fn test_2048_bits_constants()
-    {
+    fn test_2048_bits_constants() {
         //
         //    Reference: https://www.rfc-editor.org/rfc/rfc5114#page-15
         //
@@ -263,10 +322,10 @@ mod test
         let beta = alpha.modpow(&ZKP::generate_random_number_below(&q), &p);
 
         let zkp = ZKP {
-            p:     p.clone(),
-            q:     q.clone(),
+            p: p.clone(),
+            q: q.clone(),
             alpha: alpha.clone(),
-            beta:  beta.clone(),
+            beta: beta.clone(),
         };
 
         let x = ZKP::generate_random_number_below(&q);
@@ -282,4 +341,27 @@ mod test
         let result = zkp.verify(&r1, &r2, &y1, &y2, &c, &s);
         assert!(result);
     }
+
+    #[test]
+    fn test_invalid_inputs() {
+        let alpha = BigUint::from(4u32);
+        let beta = BigUint::from(9u32);
+        let p = BigUint::from(23u32);
+        let q = BigUint::from(11u32);
+        let zkp = ZKP::new(&p, &q, &alpha, &beta);
+
+        let x = BigUint::from(6u32);
+        let k = BigUint::from(7u32);
+        let c = BigUint::from(4u32);
+
+        let (y1, y2) = zkp.compute_pair(&x);
+        let (r1, r2) = zkp.compute_pair(&k);
+        let s = zkp.solve(&k, &c, &x);
+
+        // Verify with an invalid c value
+        let invalid_c = BigUint::from(999u32); // A value that's expected to fail verification
+        let result = zkp.verify(&r1, &r2, &y1, &y2, &invalid_c, &s);
+        assert!(!result); // Expect the verification to fail
+    }
 }
+
