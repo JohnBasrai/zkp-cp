@@ -1,6 +1,10 @@
 # Chaum-Pedersen Zero Knowledge Proof in Rust
 # Uses gRPC client/server for authentication
 
+This project implements a Chaum–Pedersen Zero Knowledge Proof (ZKP) protocol using Rust, with gRPC networking and async communication between client and server.
+
+(Chaum–Pedersen ZKP is a classic cryptographic proof allowing a prover to convince a verifier they know a discrete logarithm without revealing it — very advanced!)
+
 Rust crates directly used
 - tokio  Rust' asynchronous runtime, similar to ASIO for C++.
 - Tokio  Is a tool that provides the building blocks for writing network applications without compromising speed. It includes a stack of various components, such as Hyper, Tonic, Tower, and Mio, for different needs and scenarios.
