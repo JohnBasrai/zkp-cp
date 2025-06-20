@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added comprehensive CHANGELOG.md following Keep a Changelog format
 - Added table format for Rust crates documentation in README
 - Added author information to Cargo.toml
+- Installed protobuf-compiler in ci workflow
 
 ### Changed
 - Updated dependencies to compatible stable versions:
