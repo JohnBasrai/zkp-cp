@@ -1,23 +1,24 @@
 [package]
 name = "zkp-chaum-pedersen"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["John Basrai <John@Basrai.dev>"]
 
 [dependencies]
-rand = "0"
+rand = "0.8"           # The rand 0.9 ecosystem isn't fully mature yet,
+rand_core = "0.6"      # This should be compatible with rand 0.9
+rand_chacha = "0.3"    # Should work with rand 0.9
 num-bigint = { version = "0.4", features = ["rand"] }
-hex = "0"
-tonic = "0"
-prost = "0"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] } # async rust runtime
-clap = { version = "4", features = ["derive","cargo"] }
+hex = "0.4"
+tonic = "0.12"
+prost = "0.13"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+clap = { version = "4", features = ["derive", "cargo"] }
 anyhow = "1"
 rpassword = "7"
 
 [build-dependencies]
-tonic-build = "0"
+tonic-build = "0.12"
 
 [[bin]]
 name = "server"

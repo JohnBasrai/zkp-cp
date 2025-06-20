@@ -103,6 +103,21 @@ impl ZKP {
         cond1 && cond2
     }
 
+    /// Generates a random number below the specified bound.
+    ///
+    /// This method uses a secure random number generator to produce a random BigUint
+    /// that is less than the provided bound.
+    ///
+    /// # Arguments
+    /// * `bound` - The upper bound for the random number generation.
+    ///
+    /// # Returns
+    /// A `BigUint` representing the generated random number.
+    pub fn generate_random_number_below(bound: &BigUint) -> BigUint {
+        let mut rng = rand::thread_rng();
+        rng.gen_biguint_below(bound)
+    }
+
     /// Generates a random alphanumeric string of the specified size.
     ///
     /// This method uses a secure random number generator to produce a random string containing
@@ -113,12 +128,6 @@ impl ZKP {
     ///
     /// # Returns
     /// A `String` representing the generated random alphanumeric string.
-    pub fn generate_random_number_below(bound: &BigUint) -> BigUint {
-        let mut rng = rand::thread_rng();
-
-        rng.gen_biguint_below(bound)
-    }
-
     pub fn generate_random_string(size: usize) -> String {
         rand::thread_rng()
             .sample_iter(rand::distributions::Alphanumeric)
