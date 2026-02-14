@@ -54,7 +54,7 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-/// An implementation of the `Auth` trait for handling user registration, authentication challenge creation, 
+/// An implementation of the `Auth` trait for handling user registration, authentication challenge creation,
 /// and verification in the Chaum-Pedersen Zero Knowledge Proof (ZKP) protocol.
 ///
 /// `AuthImpl` manages two key data structures that are protected by mutexes for concurrent access:
@@ -62,10 +62,10 @@ async fn main() -> Result<()> {
 /// - `user_info`: A `Mutex`-protected `HashMap` that stores user registration and authentication details,
 ///   with the username as the key and the associated `UserInfo` as the value. It holds the ZKP data for each user.
 ///
-/// - `auth_id_to_user`: A `Mutex`-protected `HashMap` that maps an authentication ID (generated during 
+/// - `auth_id_to_user`: A `Mutex`-protected `HashMap` that maps an authentication ID (generated during
 ///   challenge creation) to the corresponding username. This is used to match a challenge response with the correct user.
 ///
-/// This struct is the main server-side component responsible for processing requests for registration, 
+/// This struct is the main server-side component responsible for processing requests for registration,
 /// challenge creation, and authentication verification in the ZKP protocol.
 #[derive(Debug, Default)]
 pub struct AuthImpl {
@@ -154,12 +154,12 @@ impl Auth for AuthImpl {
     ///
     /// # Arguments
     ///
-    /// * `request` - A `Request<AuthenticationChallengeRequest>` containing the user's name and 
+    /// * `request` - A `Request<AuthenticationChallengeRequest>` containing the user's name and
     ///               the values r1 and r2 for the challenge.
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `Response<AuthenticationChallengeResponse>` with the challenge details 
+    /// A `Result` containing either a `Response<AuthenticationChallengeResponse>` with the challenge details
     /// or a `Status` error if the user is not found.
     async fn create_authentication_challenge(
         &self, request: Request<AuthenticationChallengeRequest>,
@@ -199,8 +199,8 @@ impl Auth for AuthImpl {
 
     /// Verifies the solution to an authentication challenge.
     ///
-    /// This method checks the provided solution against the stored user information using the 
-    /// ZKP verification process. If successful, it generates a session ID and returns it in the 
+    /// This method checks the provided solution against the stored user information using the
+    /// ZKP verification process. If successful, it generates a session ID and returns it in the
     /// `AuthenticationAnswerResponse`. If the verification fails, an error status is returned.
     ///
     /// # Arguments
@@ -209,9 +209,9 @@ impl Auth for AuthImpl {
     ///
     /// # Returns
     ///
-    /// A `Result` containing either a `Response<AuthenticationAnswerResponse>` with the session ID 
+    /// A `Result` containing either a `Response<AuthenticationAnswerResponse>` with the session ID
     /// or a `Status` error if the authentication ID is not found or the solution is incorrect.
-     async fn verify_authentication(
+    async fn verify_authentication(
         &self, request: Request<AuthenticationAnswerRequest>,
     ) -> Result<Response<AuthenticationAnswerResponse>, Status> {
         let request = request.into_inner();
